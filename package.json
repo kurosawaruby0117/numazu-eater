@@ -3,12 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@google-cloud/translate": "^6.0.3",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.2",
     "@testing-library/user-event": "^12.2.2",
+    "axios": "^0.21.0",
+    "firebase": "^8.0.1",
+    "firebase-tools": "^8.16.0",
+    "korean-name-generator": "^1.0.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-listbox": "^1.2.13",
+    "react-react": "^1.2.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
+    "react-select": "^3.1.0",
+    "request": "^2.88.2",
+    "translate-google-api": "^1.0.4",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
