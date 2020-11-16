@@ -1,24 +1,37 @@
 import React, { useState } from "react"
-import fireBase, { dbService } from "../myBase"
+import fireBase, { dbService, storageService } from "../myBase"
 import namer from "korean-name-generator"
 import Select from 'react-select'
+
+import {v4 as uuidv4} from "uuid";
+import { amount_options, service_option, taste_options } from "./ranking"
+import { render } from "@testing-library/react"
 const ReviewWriting=({userObj})=>{
-    const options = [
-        { value: '0', label: '진짜 맛없음' },
-        { value: '1', label: '맛없음' },
-        { value: '2', label: '먹을만함' },
-        { value: '3', label: '맛있음' },
-        { value: '4', label: '존맛탱' }
-      ]
+   
     const [foodName,setFoodName]=useState("");
     const [restName,setRestName]=useState("");
     const [think,setThink]=useState("");
     const [staring,setStar]=useState("먹을만함");
+    const [tasteRank,setTasteRank]=useState(3);
+    const [amountSet,setAmount]=useState("적당함")
+    const [amountRank,setAmountRank]=useState(3)
+    const [service,setService]=useState("보통");
+    const [serviceRank,setServiceRank]=useState(3);
     const [selectedOption, setSelectedOption] = useState("3");
+    const [photo,setAttachment]=useState("");
+    
     const onSubmit=async(event)=>{
+        event.preventDefault();
+        let photoUrl=""
+        if(photo!=""){
+            const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
+            console.log(fileRef);
+            const responce=await fileRef.putString(photo,"data_url");
+            photoUrl=await responce.ref.getDownloadURL();
+        }
         var name=namer.generate(true);
         console.log(staring)
-        event.preventDefault();
+       
         const newFood={
             foodName:foodName,
             restName:restName,
@@ -26,10 +39,18 @@ const ReviewWriting=({userObj})=>{
             createdAt:Date.now(),
             creator:userObj.uid,
             createdName:name,
-            star:staring
+            star:staring,
+            amount:amountSet,
+            tasteRank:tasteRank,
+            amountRank:amountRank,
+            service:service,
+            serviceRank:serviceRank,
+            photoUrl:photoUrl
         }
         const sibal=await dbService.collection("numazufood").add(newFood);
         const byunsin=sibal['u_']['path']['segments'][1];
+        console.log(byunsin);
+        setAttachment("");
         window.location.replace(`/#/food/${byunsin}`);
     }
     const onChange=(event)=>{
@@ -43,19 +64,56 @@ const ReviewWriting=({userObj})=>{
             setFoodName(target.value);
         }
     }
-    const onStar=(event)=>{
+    const onStar_taste=(event)=>{
+        
         setStar(event.label);
+        setTasteRank(event.value);
+    }
+    const onStar_amount=(event)=>{
+        setAmount(event.label);
+        setAmountRank(event.value);
+    }
+    const onStar_Service=(event)=>{
+        setService(event.label);
+        setServiceRank(event.value);
+    }
+    const onFileChange=(event)=>{
+        const{
+            target:{files}
+        }=event;
+        console.log(event.target.files);
+        if((files.length)!==0){
+        const theFile=files[0];
+        const reader=new FileReader();
+        reader.onloadend=(finishedEvent)=>{
+            const {currentTarget:{result}}=finishedEvent;
+            setAttachment(result);
+        }
+        reader.readAsDataURL(theFile);}else{
+            setAttachment("");
+        }
     }
     return(
         <>
             <div>
+                {
+                    photo&&(
+                        <div>
+                            <img src={photo} width="100px" height="100px"></img>
+                        </div>
+                    )
+                }
                 <form onSubmit={onSubmit} >
                     <input type="text" placeholder="레스트랑 이름" required name="rest" onChange={onChange}/>   
                     <input type="text" placeholder="먹은 음식" required name="food" onChange={onChange}/>
+                    <input type="file" accept="image/*" onChange={onFileChange} required/>
+                    
                     <p>
                         <textarea placeholder="후기" required name="feel"onChange={onChange}/>
                     </p>
-                    <Select name="star" default={selectedOption} required options={options} onChange={onStar}></Select>
+                    <Select name="star" placeholder="맛 평가"default={selectedOption} required options={taste_options} onChange={onStar_taste}></Select>
+                    <Select name="amount" placeholder="양 평가"default={selectedOption} required options={amount_options} onChange={onStar_amount}></Select>
+                    <Select name="service" placeholder="친절도 평가"default={selectedOption} required options={service_option} onChange={onStar_Service }></Select>
                     <input type="submit" value="upload"/>
                 </form>
             </div>
