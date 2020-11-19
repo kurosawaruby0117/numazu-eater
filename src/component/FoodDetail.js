@@ -119,6 +119,9 @@ const FoodDetail=({userObj})=>{
         setNewPhoto(true);
     }
     const toggleEditing=()=>setEditin(prev=>!prev);
+    const toggleEditing2=()=>{
+        setNewPhoto(prev=>!prev);
+        setNewPhoto_prev("")};
     const DeleteButton=async()=>{
             const ok=window.confirm("Are you sure?");
             if(ok){
@@ -143,8 +146,15 @@ const FoodDetail=({userObj})=>{
                 <Select name="amount" placeholder={amount_set}options={amount_options} onChange={onStart_amount}></Select>
                 <Select name="service" placeholder={setViceSet}options={service_option} onChange={onStar_Service}></Select>
                 {
-                    !newPhoto?(<><button onClick={onClickChange}>Change Photo</button></>):( <input type="file" accept="image/*" onChange={onFileChange} required/>)
+                    !newPhoto?(<><button onClick={onClickChange}>Change Photo</button></>):( <><input type="file" accept="image/*" onChange={onFileChange} required/>
+                    <button onClick={toggleEditing2}>Cancel</button></>)
+                  
+                    
                 }
+                {
+                    newPhoto_prev?(<><img src={newPhoto_prev} width="100px" height="100px"></img></>):(<></>)
+                }
+                   
                <input type="submit" value="update neweets"></input>
                </form>
                 <button onClick={toggleEditing}>Cancel</button>
