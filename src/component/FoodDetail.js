@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { dbService } from "../myBase";
+import { dbService, storageService } from "../myBase";
 import translate from 'translate-google-api';
+
+import {v4 as uuidv4} from "uuid";
 import Select from 'react-select'
 import { amount_options, onStar_Service, service_option, taste_options } from "./ranking";
 const FoodDetail=({userObj})=>{
@@ -18,6 +20,9 @@ const FoodDetail=({userObj})=>{
     const [amountRank_t,setAmountRank]=useState();
     const [setViceSet,setService]=useState("");
     const [serviceRank,setServiceRank]=useState();
+    const [photoUrl_, setPhotoUrl]=useState("");
+    const [newPhoto,setNewPhoto]=useState(false);
+    const [newPhoto_prev,setNewPhoto_prev]=useState("");
     const aboutFood=async()=> {
         const setV=await dbService.collection("numazufood").doc(id.id).get();
       
@@ -30,6 +35,7 @@ const FoodDetail=({userObj})=>{
         setStarRank(setV.data().tasteRank);
         setServiceRank(setV.data().serviceRank);
         setService(setV.data().service);
+        setPhotoUrl(setV.data().photoUrl);
         setLoading(true);
         setValue(setV.data());
     };
@@ -37,7 +43,20 @@ const FoodDetail=({userObj})=>{
         aboutFood();
     },[]);
     const onSubmit=async(event)=>{
+        
         event.preventDefault();
+        let photooo;
+        if(newPhoto){
+            console.log(1);
+            await storageService.refFromURL(value.photoUrl).delete();
+            
+            const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
+            console.log(fileRef);
+            const responce=await fileRef.putString(newPhoto_prev,"data_url");
+            photooo=await responce.ref.getDownloadURL();
+            setPhotoUrl(photooo);
+        }
+        console.log(photoUrl_===photooo);
         await dbService.doc(`numazufood/${id.id}`).update({
             foodName:newFoodNweet,
             restName:newRestNweet,
@@ -51,7 +70,7 @@ const FoodDetail=({userObj})=>{
             amountRank:amountRank_t,
             service:setViceSet,
             serviceRank:serviceRank,
-            photoUrl:value.photoUrl
+            photoUrl:newPhoto?photooo:photoUrl_
         });
         setEditin(false);
         window.location.reload();
@@ -67,6 +86,23 @@ const FoodDetail=({userObj})=>{
             setNewThinkNweet(target.value);
         }
     }
+    const onFileChange=(event)=>{
+        const{
+            target:{files}
+        }=event;
+        console.log(event.target.files);
+        if((files.length)!==0){
+        const theFile=files[0];
+        const reader=new FileReader();
+        reader.onloadend=(finishedEvent)=>{
+            const {currentTarget:{result}}=finishedEvent;
+            setNewPhoto_prev(result);
+        }
+        reader.readAsDataURL(theFile);}
+        else{
+            setNewPhoto_prev("");
+        }
+    }
     const onStar_taste=(event)=>{
         setStar(event.label);
         setStarRank(event.value);
@@ -79,14 +115,18 @@ const FoodDetail=({userObj})=>{
         setService(event.label);
         setServiceRank(event.value);
     }
+    const onClickChange=()=>{
+        setNewPhoto(true);
+    }
     const toggleEditing=()=>setEditin(prev=>!prev);
     const DeleteButton=async()=>{
             const ok=window.confirm("Are you sure?");
             if(ok){
                 await dbService.doc(`numazufood/${id.id}`).delete();
+                await storageService.refFromURL(value.photoUrl).delete();
                 window.location.replace("/");
             }else{
-    
+                
             }
     }
     return(
@@ -95,13 +135,16 @@ const FoodDetail=({userObj})=>{
            {   loading?(
                editing?
                (<>{value.creator===userObj.uid&&(<>
+                <img src={value.photoUrl} width="100px" height="100px"></img>
                <form onSubmit={onSubmit}>
                 <input name="rest" value={newRestNweet}  required onChange={onChange}/>
                 <input name="food" value={newFoodNweet}  required onChange={onChange}/>
-                <textarea name="think" value={newThinkNweet} required onChange={onChange}/>
-                <Select name="star" placeholder={staring}options={taste_options} onChange={onStar_taste}></Select>
+                <Select name="star" value={photoUrl_}placeholder={staring}options={taste_options} onChange={onStar_taste}></Select>
                 <Select name="amount" placeholder={amount_set}options={amount_options} onChange={onStart_amount}></Select>
                 <Select name="service" placeholder={setViceSet}options={service_option} onChange={onStar_Service}></Select>
+                {
+                    !newPhoto?(<><button onClick={onClickChange}>Change Photo</button></>):( <input type="file" accept="image/*" onChange={onFileChange} required/>)
+                }
                <input type="submit" value="update neweets"></input>
                </form>
                 <button onClick={toggleEditing}>Cancel</button>

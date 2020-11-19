@@ -30,8 +30,6 @@ const ReviewWriting=({userObj})=>{
             photoUrl=await responce.ref.getDownloadURL();
         }
         var name=namer.generate(true);
-        console.log(staring)
-       
         const newFood={
             foodName:foodName,
             restName:restName,
