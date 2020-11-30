@@ -5,7 +5,8 @@ import translate from 'translate-google-api';
 
 import {v4 as uuidv4} from "uuid";
 import Select from 'react-select'
-import { amount_options, onStar_Service, service_option, taste_options } from "./ranking";
+import { amount_options, food_variable, onStar_Service, service_option, taste_options } from "./ranking";
+import {Loading, Uploading} from "./Loading";
 const FoodDetail=({userObj})=>{
     const id=useParams();
     const [value,setValue]=useState('');
@@ -23,6 +24,7 @@ const FoodDetail=({userObj})=>{
     const [photoUrl_, setPhotoUrl]=useState("");
     const [newPhoto,setNewPhoto]=useState(false);
     const [newPhoto_prev,setNewPhoto_prev]=useState("");
+    const [editLoading,setEditLoading]=useState(false);
     const aboutFood=async()=> {
         const setV=await dbService.collection("numazufood").doc(id.id).get();
       
@@ -43,11 +45,12 @@ const FoodDetail=({userObj})=>{
         aboutFood();
     },[]);
     const onSubmit=async(event)=>{
-        
         event.preventDefault();
+        try{
+        
+        setEditLoading(true);
         let photooo;
         if(newPhoto){
-            console.log(1);
             await storageService.refFromURL(value.photoUrl).delete();
             
             const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
@@ -56,7 +59,6 @@ const FoodDetail=({userObj})=>{
             photooo=await responce.ref.getDownloadURL();
             setPhotoUrl(photooo);
         }
-        console.log(photoUrl_===photooo);
         await dbService.doc(`numazufood/${id.id}`).update({
             foodName:newFoodNweet,
             restName:newRestNweet,
@@ -73,7 +75,15 @@ const FoodDetail=({userObj})=>{
             photoUrl:newPhoto?photooo:photoUrl_
         });
         setEditin(false);
-        window.location.reload();
+       
+        window.location.reload();}
+        catch(error){
+            await dbService.doc(`numazufood/${id.id}`).update({
+                photoUrl:photoUrl_
+            });
+            setEditin(false);
+            window.location.reload();
+        }
     }
     const onChange=(event)=>{
         const {target}=event;
@@ -136,6 +146,7 @@ const FoodDetail=({userObj})=>{
 
         <div>
            {   loading?(
+               !editLoading?(
                editing?
                (<>{value.creator===userObj.uid&&(<>
                 <img src={value.photoUrl} width="100px" height="100px"></img>
@@ -145,6 +156,7 @@ const FoodDetail=({userObj})=>{
                 <Select name="star" value={photoUrl_}placeholder={staring}options={taste_options} onChange={onStar_taste}></Select>
                 <Select name="amount" placeholder={amount_set}options={amount_options} onChange={onStart_amount}></Select>
                 <Select name="service" placeholder={setViceSet}options={service_option} onChange={onStar_Service}></Select>
+                <Select name="foodVarible" placeholder={setViceSet}options={food_variable} onChange={onStar_Service}></Select>
                 {
                     !newPhoto?(<><button onClick={onClickChange}>Change Photo</button></>):( <><input type="file" accept="image/*" onChange={onFileChange} required/>
                     <button onClick={toggleEditing2}>Cancel</button></>)
@@ -181,8 +193,11 @@ const FoodDetail=({userObj})=>{
                }
                </>
                )
-           ):<div>wait..</div>
-            }</div>);
+               ):<Uploading/>
+           ):<Loading action="getFoodInfo"/>
+        }
+        </div>
+    );
 }
 
 export default FoodDetail;

@@ -6,6 +6,7 @@ import Select from 'react-select'
 import {v4 as uuidv4} from "uuid";
 import { amount_options, service_option, taste_options } from "./ranking"
 import { render } from "@testing-library/react"
+import { Uploading } from "./Loading";
 const ReviewWriting=({userObj})=>{
    
     const [foodName,setFoodName]=useState("");
@@ -19,9 +20,10 @@ const ReviewWriting=({userObj})=>{
     const [serviceRank,setServiceRank]=useState(3);
     const [selectedOption, setSelectedOption] = useState("3");
     const [photo,setAttachment]=useState("");
-    
+    const [writing,setWriting]=useState(false);
     const onSubmit=async(event)=>{
         event.preventDefault();
+        setWriting(true);
         let photoUrl=""
         if(photo!=""){
             const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
@@ -93,8 +95,10 @@ const ReviewWriting=({userObj})=>{
     }
     return(
         <>
+            {!writing?(
             <div>
                 {
+                    
                     photo&&(
                         <div>
                             <img src={photo} width="100px" height="100px"></img>
@@ -112,10 +116,11 @@ const ReviewWriting=({userObj})=>{
                     <Select name="star" placeholder="맛 평가"default={selectedOption} required options={taste_options} onChange={onStar_taste}></Select>
                     <Select name="amount" placeholder="양 평가"default={selectedOption} required options={amount_options} onChange={onStar_amount}></Select>
                     <Select name="service" placeholder="친절도 평가"default={selectedOption} required options={service_option} onChange={onStar_Service }></Select>
+                    <Select name="service" placeholder="친절도 평가"default={selectedOption} required options={service_option} onChange={onStar_Service }></Select>
                     <input type="submit" value="upload"/>
                 </form>
             </div>
-        </>
+            ):<Uploading></Uploading>}</>
     )
 }
 export default ReviewWriting;
