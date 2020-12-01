@@ -46,10 +46,12 @@ const FoodDetail=({userObj})=>{
     },[]);
     const onSubmit=async(event)=>{
         event.preventDefault();
+        let photooo;
+        setEditLoading(true);
         try{
         
-        setEditLoading(true);
-        let photooo;
+        
+        
         if(newPhoto){
             await storageService.refFromURL(value.photoUrl).delete();
             
@@ -74,16 +76,34 @@ const FoodDetail=({userObj})=>{
             serviceRank:serviceRank,
             photoUrl:newPhoto?photooo:photoUrl_
         });
-        setEditin(false);
        
-        window.location.reload();}
-        catch(error){
-            await dbService.doc(`numazufood/${id.id}`).update({
-                photoUrl:photoUrl_
-            });
-            setEditin(false);
-            window.location.reload();
         }
+        catch(error){
+            if(newPhoto){
+                const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
+                console.log(fileRef);
+                const responce=await fileRef.putString(newPhoto_prev,"data_url");
+                photooo=await responce.ref.getDownloadURL();
+                setPhotoUrl(photooo);
+            }
+            await dbService.doc(`numazufood/${id.id}`).update({
+                foodName:newFoodNweet,
+                restName:newRestNweet,
+                think:newThinkNweet,
+                createdAt:value.createdAt,
+                creator:userObj.uid,
+                createdName:value.createdName,
+                star:staring,
+                amount:amount_set,
+                tasteRank:starRank,
+                amountRank:amountRank_t,
+                service:setViceSet,
+                serviceRank:serviceRank,
+                photoUrl:newPhoto?photooo:photoUrl_
+            });
+        }
+        setEditin(false);
+        window.location.reload();
     }
     const onChange=(event)=>{
         const {target}=event;
@@ -133,13 +153,19 @@ const FoodDetail=({userObj})=>{
         setNewPhoto(prev=>!prev);
         setNewPhoto_prev("")};
     const DeleteButton=async()=>{
-            const ok=window.confirm("Are you sure?");
-            if(ok){
-                await dbService.doc(`numazufood/${id.id}`).delete();
-                await storageService.refFromURL(value.photoUrl).delete();
-                window.location.replace("/");
-            }else{
+        const ok=window.confirm("Are you sure?");
+            try{
                 
+                if(ok){
+                    await dbService.doc(`numazufood/${id.id}`).delete();
+                    await storageService.refFromURL(value.photoUrl).delete();
+                    window.location.replace("/");
+                }else{
+                    
+                }
+            }catch(error){
+                await dbService.doc(`numazufood/${id.id}`).delete();
+                window.location.replace("/");
             }
     }
     return(
