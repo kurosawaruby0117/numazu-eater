@@ -25,8 +25,11 @@ const FoodDetail=({userObj})=>{
     const [newPhoto,setNewPhoto]=useState(false);
     const [newPhoto_prev,setNewPhoto_prev]=useState("");
     const [editLoading,setEditLoading]=useState(false);
+    const [foodRoute,setRoute]=useState(false);
     const aboutFood=async()=> {
-        const setV=await dbService.collection("numazufood").doc(id.id).get();
+        var path=window.location.pathname;
+        console.log(path);
+        const setV=await dbService.collection(`${path}`).doc(id.id).get();
       
         setNewRestNweet(setV.data().restName)
         setNewFoodNweet(setV.data().foodName)

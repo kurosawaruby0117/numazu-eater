@@ -1,18 +1,16 @@
 import React from "react"
 import { Link } from "react-router-dom";
 
-const Food=({foodObj})=>{
+const Foodindex=({foodSort})=>{
     return(
         <>
-        <Link to={`/{}/${foodObj.id}`}>
+        <Link to={`/${foodSort}`}>
         <div>
-        
-            <span>음식명:{foodObj.foodName} </span>
-    
+            <div>뱝</div>
         </div>
         </Link>
         </>
     )
 }
 
-export default Food;
+export default Foodindex;

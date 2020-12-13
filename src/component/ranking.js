@@ -21,11 +21,10 @@ export const service_option=[
 ]
 
 export const food_variable=[
-    {value:'0',label:'밥'},
-    {value:'1',label:'면'},
-    {value:'2',label:'수산물'},
-    {value:'3',label:'고기'},
-    {value:'4',label:'안주류'},
-    {value:'5',label:'간식류'},
-    {value:'6',label:'기타류'}
+    {value:'rice',label:'밥'},
+    {value:'men',label:'면'},
+    {value:'sakana',label:'수산물'},
+    {value:'niku',label:'고기'},
+    {value:'kaori',label:'술/안주'},
+    {value:'cookie',label:'간식'}
 ]
