@@ -29,8 +29,7 @@ const FoodDetail=({userObj})=>{
     const aboutFood=async()=> {
         var path=window.location.hash;
         const addList=path.split("/")[1];
-        console.log(addList);
-        console.log("7");
+        setRoute(addList);
         const setV=await dbService.collection(`${addList}`).doc(id.id).get();
       
         setNewRestNweet(setV.data().restName)
@@ -66,7 +65,7 @@ const FoodDetail=({userObj})=>{
             photooo=await responce.ref.getDownloadURL();
             setPhotoUrl(photooo);
         }
-        await dbService.doc(`numazufood/${id.id}`).update({
+        await dbService.doc(`${foodRoute}/${id.id}`).update({
             foodName:newFoodNweet,
             restName:newRestNweet,
             think:newThinkNweet,
@@ -91,7 +90,7 @@ const FoodDetail=({userObj})=>{
                 photooo=await responce.ref.getDownloadURL();
                 setPhotoUrl(photooo);
             }
-            await dbService.doc(`numazufood/${id.id}`).update({
+            await dbService.doc(`${foodRoute}/${id.id}`).update({
                 foodName:newFoodNweet,
                 restName:newRestNweet,
                 think:newThinkNweet,
@@ -162,14 +161,14 @@ const FoodDetail=({userObj})=>{
             try{
                 
                 if(ok){
-                    await dbService.doc(`numazufood/${id.id}`).delete();
+                    await dbService.doc(`${foodRoute}/${id.id}`).delete();
                     await storageService.refFromURL(value.photoUrl).delete();
                     window.location.replace("/");
                 }else{
                     
                 }
             }catch(error){
-                await dbService.doc(`numazufood/${id.id}`).delete();
+                await dbService.doc(`${foodRoute}/${id.id}`).delete();
                 window.location.replace("/");
             }
     }
