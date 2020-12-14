@@ -1,12 +1,12 @@
 import React from "react"
 import { Link } from "react-router-dom";
 
-const Foodindex=({foodSort})=>{
+const Foodindex=({foodSort,foodDe})=>{
     return(
         <>
-        <Link to={`/${foodSort}`}>
+        <Link to={`/sort/${foodSort}/`}>
         <div>
-            <div>뱝</div>
+            <div>{foodDe}</div>
         </div>
         </Link>
         </>

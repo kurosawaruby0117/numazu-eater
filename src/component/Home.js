@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Food from "./FoodInfo";
 import { dbService } from "../myBase";
 import { Map_show } from "../Map";
-import Foodindex from "../foodIndex";
+import Foodindex from "./foodIndex";
 const Home=({userObj})=>{
     const [rice,setRice]=useState([]);
     const [men,setMen]=useState([]);

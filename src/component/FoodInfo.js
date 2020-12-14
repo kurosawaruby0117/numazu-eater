@@ -1,10 +1,10 @@
 import React from "react"
 import { Link } from "react-router-dom";
 
-const Food=({foodObj})=>{
+const Food=({foodObj,foodRout})=>{
     return(
         <>
-        <Link to={`/{}/${foodObj.id}`}>
+        <Link to={`/${foodRout}/${foodObj.id}`}>
         <div>
         
             <span>음식명:{foodObj.foodName} </span>

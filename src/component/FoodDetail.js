@@ -27,9 +27,11 @@ const FoodDetail=({userObj})=>{
     const [editLoading,setEditLoading]=useState(false);
     const [foodRoute,setRoute]=useState(false);
     const aboutFood=async()=> {
-        var path=window.location.pathname;
-        console.log(path);
-        const setV=await dbService.collection(`${path}`).doc(id.id).get();
+        var path=window.location.hash;
+        const addList=path.split("/")[1];
+        console.log(addList);
+        console.log("7");
+        const setV=await dbService.collection(`${addList}`).doc(id.id).get();
       
         setNewRestNweet(setV.data().restName)
         setNewFoodNweet(setV.data().foodName)
