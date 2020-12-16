@@ -25,8 +25,19 @@ const FoodDetail=({userObj})=>{
     const [newPhoto,setNewPhoto]=useState(false);
     const [newPhoto_prev,setNewPhoto_prev]=useState("");
     const [editLoading,setEditLoading]=useState(false);
+<<<<<<< Updated upstream
     const aboutFood=async()=> {
         const setV=await dbService.collection("numazufood").doc(id.id).get();
+=======
+    const [foodRoute,setRoute]=useState("");
+    const aboutFood=async()=> {
+        var path=window.location.hash;
+        const addList=path.split("/")[1];
+        console.log(addList);
+        setRoute(addList);
+        console.log("7");
+        const setV=await dbService.collection(`${addList}`).doc(id.id).get();
+>>>>>>> Stashed changes
       
         setNewRestNweet(setV.data().restName)
         setNewFoodNweet(setV.data().foodName)
@@ -56,12 +67,11 @@ const FoodDetail=({userObj})=>{
             await storageService.refFromURL(value.photoUrl).delete();
             
             const fileRef=storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
-            console.log(fileRef);
             const responce=await fileRef.putString(newPhoto_prev,"data_url");
             photooo=await responce.ref.getDownloadURL();
             setPhotoUrl(photooo);
         }
-        await dbService.doc(`numazufood/${id.id}`).update({
+        await dbService.doc(`${foodRoute}/${id.id}`).update({
             foodName:newFoodNweet,
             restName:newRestNweet,
             think:newThinkNweet,
@@ -86,7 +96,7 @@ const FoodDetail=({userObj})=>{
                 photooo=await responce.ref.getDownloadURL();
                 setPhotoUrl(photooo);
             }
-            await dbService.doc(`numazufood/${id.id}`).update({
+            await dbService.doc(`${foodRoute}/${id.id}`).update({
                 foodName:newFoodNweet,
                 restName:newRestNweet,
                 think:newThinkNweet,
